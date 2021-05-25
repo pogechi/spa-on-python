@@ -12,6 +12,16 @@ This Python function is based on [lerkoah/spa-on-python](https://github.com/lerk
 
 ## Example
 
+Execute script. You will be prompted to:
+
+![PySimpleGUI](https://user-images.githubusercontent.com/84137850/119478250-f24b0180-bd4f-11eb-8b08-17c38b479a92.PNG)
+
+Select your .spa file(s) and click "Submit".
+
+Your spectrum/spectra will be plotted. Below is a sample image using polystyrene:
+
+![Polystyrene](https://user-images.githubusercontent.com/84137850/119478100-d0517f00-bd4f-11eb-88fc-8bc895a70fce.png)
+
 
 # License
 GNU General Public License v3.0 or later
