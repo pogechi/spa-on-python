@@ -1,26 +1,17 @@
 # Read SPA on python
 
-Usage:
-```python
-spectra, wavelength, title = read_spa(filepath)
-```
+## Usage:
 
-This python function is based on [LoadSprecta](https://la.mathworks.com/matlabcentral/fileexchange/57904-loadspectra) from matlab. It allows working with FTIR spectrums.
+Use PySimpleGUI to select as many .spa files as you wish.
+
+The function extracts count and wavenumber data to generate a Pandas DataFrame.
+
+Finally, the spectra are plotted on top of each other using Seaborn. For multiple plots in the same image, an optional plot is provided at the end of the script.
+
+This Python function is based on [lerkoah/spa-on-python](https://github.com/lerkoah/spa-on-python), which in turn is based on [LoadSpectra](https://la.mathworks.com/matlabcentral/fileexchange/57904-loadspectra) from matlab. The original file allows working with FTIR spectra.
 
 ## Example
-For importing a lot of file you can use ``pathlib``:
 
-```python
-from LoadSpectrum import read_spa
-import pathlib
- 
-basepath = '.'
-paths = [str(x) for x in list(pathlib.Path(basepath).rglob('*.spa'))]
-print('Files detected: {}'.format(len(paths)))
-
-for path in paths:
-  spectra_tmp, wavelength_tmp, title_tmp = read_spa(path)
-```
 
 # License
 GNU General Public License v3.0 or later
