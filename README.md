@@ -1,4 +1,4 @@
-# Read SPA on python
+# Read .SPA Raman files using Python
 
 ## Usage:
 
