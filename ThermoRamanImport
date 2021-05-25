@@ -1,0 +1,118 @@
+# -*- coding: utf-8 -*-
+
+import PySimpleGUI as sg
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+import os
+
+## Create GUI and select .spa files
+
+sg.theme("SystemDefaultForReal")
+
+layout = [
+    [sg.Text("Choose a group of SPA files:")],
+    [sg.InputText(size=(80,1)),
+     sg.FilesBrowse(file_types=((".spa files", "*.spa"),), 
+                         key=("-SPA-"))],
+    [sg.Submit()] 
+          ]
+
+window = sg.Window("Raman spectra importer", layout)
+
+event, values = window.read(close=True)
+
+spalist = values["-SPA-"].split(';')
+
+print(len(spalist), "File(s) imported: ", [os.path.basename(f) for f in spalist])
+
+spanames = [] # Empty placeholder
+
+for f in spalist:
+    # Only keep filename to generate sample ID
+    spafiles = os.path.basename(f)[:-4:]
+    
+    # populate placeholder with filenames
+    spanames.append(spafiles)
+
+### SPA File import
+
+frame = pd.DataFrame()
+
+for i,j in zip(spalist, spanames):
+    with open(i, 'rb') as f:
+        
+        f.seek(576)
+        Wavenumbers = np.array(np.flip(np.linspace(50, 3399, 1738)))
+            
+        f.seek(288)
+        Flag=0
+        while Flag != 3:
+            Flag = np.fromfile(f, np.uint16, 1)
+    
+        DataPosition = np.fromfile(f,np.uint16, 1)
+        f.seek(DataPosition[0])
+    
+        Counts = np.array(np.fromfile(f, np.single, 1738))
+        dfR = pd.DataFrame()
+        dfR["sample"] = [j] * 1738
+        dfR["Counts"] = Counts
+        dfR["Wavenumbers"] = Wavenumbers
+        frame = frame.append(dfR)
+        
+frame = frame.rename_axis(index="point") 
+
+"""
+# Optional filter to remove data points above/below a user-defined threshhold
+
+#lowfilter = -10
+#highfilter = 10E4
+#frame = frame[frame["Counts"] > lowfilter]
+#frame = frame[frame["Counts"] < highfilter]
+"""
+
+### Seaborn plot settings
+
+sns.set_theme() # Pleasant Seaborn theme
+sns.set_context("talk") # Large font size
+fig = plt.gcf()
+fig.set_size_inches( 12, 4)
+
+## Single Raman plot
+
+g = sns.relplot(palette="rocket",
+                legend="auto",
+                x="Wavenumbers", 
+                y="Counts", 
+                hue="sample", # for spectra of similar samples, 
+                              # remove "hue" to get 95% confidence interval
+                ci="sd",
+                kind="line", 
+                data=frame)
+
+g.set(xlim=(3400,50)) # Typical Raman spectrum interval
+g.set(yticklabels=[])
+g.set_axis_labels("Wavenumbers (cm$^{-1}$)", "Counts (a.u.)")
+
+"""
+## Stacked Raman plots
+    
+sns.set_context("poster") # Largest font size
+
+g = sns.relplot(palette="rocket",
+                legend=False,
+                x="Wavenumbers", 
+                y="Counts",
+                hue="sample",
+                col="sample",
+                kind="line",
+                aspect=1.5,
+                col_wrap=3,
+                data=frame)  
+
+g.set(xlim=(3400,50)) # Typical Raman spectrum interval
+g.set(yticklabels=[])
+g.set_axis_labels("Wavenumbers (cm$^{-1}$)", "Counts (a.u.)")
+
+"""
